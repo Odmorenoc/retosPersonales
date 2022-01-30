@@ -10,3 +10,7 @@ a. Complejidad temporal lineal, es decir O(n)
 b. Complejidad espacial constante, O(1) en otras palabras no se puede utilizar un array auxiliar.
 
 Lo modifique para que el usuario defina el tamaño del array.
+
+## __2. ejerciciosPrueba1.py__
+
+Es el desarrollo de los 10 ejercicios propuestos en https://pythondiario.com/2013/05/ejercicios-en-python-parte-1.html
