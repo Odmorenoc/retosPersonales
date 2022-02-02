@@ -14,3 +14,9 @@ Lo modifique para que el usuario defina el tamaño del array.
 ## __2. ejerciciosPrueba1.py__
 
 Es el desarrollo de los 10 ejercicios propuestos en https://pythondiario.com/2013/05/ejercicios-en-python-parte-1.html
+
+## __3. retoCadenas.py__
+
+Es el desarrollo de un reto que consiste en contar el numero de veces que aparece una palabra en una cadena de texto.
+
+
