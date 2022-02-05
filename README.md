@@ -19,4 +19,8 @@ Es el desarrollo de los 10 ejercicios propuestos en https://pythondiario.com/201
 
 Es el desarrollo de un reto que consiste en contar el numero de veces que aparece una palabra en una cadena de texto.
 
+## __4. jsonCoord.py__
+
+Programa que extrae las coordenadas de las fotografias al interior de un directorio en window y las convierte en decimales.
+
 
