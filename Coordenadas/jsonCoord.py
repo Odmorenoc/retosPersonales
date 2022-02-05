@@ -1,5 +1,5 @@
 ## generar un csv con las coordenadas de las fotos que se encuentran en una carpeta.
-from cmath import nan
+from cmath import isnan, nan
 # from pathlib import Path
 # from PIL import Image
 # from PIL.ExifTags import TAGS
@@ -7,8 +7,8 @@ import os
 import exifread
 from pyproj import Transformer
 import pandas as pd
-from pandas import ExcelWriter
 import numpy as np
+import json
 
 pd.options.display.float_format = '{:.9f}'.format
 
@@ -60,7 +60,7 @@ def hallarCoords(archivos, path):
     for i in coords:
         cont +=1
     
-    print(f'hay {cont} imagenes')
+    print(f'hay {cont} archivos en la carpeta \n\n')
     return coords
 
 def CoordenadasDecimales(DATOSFOTOS):
@@ -91,9 +91,7 @@ def CoordenadasDecimales(DATOSFOTOS):
                         if dato == 'W':
                             coordenadaDecimal *= -1
                         coordenadaFoto.append(coordenadaDecimal)
-        coordenadasFotos.append(coordenadaFoto)
-    for i in coordenadasFotos:
-        print(i)    
+        coordenadasFotos.append(coordenadaFoto)   
     return coordenadasFotos
 
 def transformar(origen, destino, ListaCoordenadas): 
@@ -115,7 +113,38 @@ def transformar(origen, destino, ListaCoordenadas):
 
     df=pd.DataFrame(CoordTransformadas, columns=['nombre', 'N', 'W', 'X', 'Y'])
     print(df)
+
     return df
+
+def json(df):
+    lista= df.to_numpy().tolist()
+    encabezado = '{"features":['
+    cuerpo =''
+    cont = 0
+    for fila in lista:
+        if fila[0] == 'coordenadas.csv':
+            continue
+        elif isnan(fila[3]):
+            continue
+        else:
+            primero = '{"geometry":{"x":'
+            x=lambda x: x if fila[3] != nan else fila[3]
+            x=str(fila[3])
+            segundo=',"y":'
+            y=str(fila[4])
+            tercero=',"spatialReference":{"wkid":102100}},"attributes":{"name":"'
+            nombre=str(fila[0])
+            cuarto= '","description":""},"symbol":{"color":[255,0,0,255],"size":12,"angle":0,"xoffset":0,"yoffset":0,"type":"esriSMS","style":"esriSMSCross","outline":{"color":[0,0,0,255],"width":0.75,"type":"esriSLS","style":"esriSLSSolid"}}},'
+            cuerpo = cuerpo+primero+x+segundo+y+tercero+nombre+cuarto
+            cont += 1
+    cuerpo = cuerpo[:len(cuerpo)-1]
+    final = '],"displayFieldName":"","fieldAliases":{},"spatialReference":{"wkid":102100,"latestWkid":3857},"fields":[]}'
+    scripJson=encabezado+cuerpo+final
+    file = open('data.json', 'w')
+    file.write(scripJson)
+
+    print(f'\nse generó un archivo tipo Json con las coordenadas de {cont} imagenes')
+
 
 def run(path):
     listArchivos = listarArchivos(path)
@@ -133,4 +162,5 @@ if __name__=='__main__':
     destino=3857
     df=transformar(origen, destino, decimales)
     df.to_csv(f'{PATH}\coordenadas.csv')
+    json(df)
 
