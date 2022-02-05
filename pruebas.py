@@ -33,7 +33,8 @@ for datosfoto in DATOSFOTOS:
           coordenadaFoto.append(coordenadaDecimal)
   coordenadasFotos.append(coordenadaFoto)
 
-for i in coordenadasFotos:
-  print(i)
+
+
+
           
 

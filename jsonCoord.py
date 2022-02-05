@@ -99,7 +99,6 @@ if __name__=='__main__':
     PATH = input('cual es la carpeta en la que se encuentran las fotos?: ')
     listArchivos = listarArchivos(PATH)
     coords=hallarCoords(listArchivos, PATH)
-    print(coords)
     decimales = CoordenadasDecimales(coords)
     for i in decimales:
         print(i)
