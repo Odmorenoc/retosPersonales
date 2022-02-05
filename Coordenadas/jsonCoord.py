@@ -1,33 +1,40 @@
 ## generar un csv con las coordenadas de las fotos que se encuentran en una carpeta.
-from PIL import Image
-from PIL.ExifTags import TAGS
+from cmath import nan
+# from pathlib import Path
+# from PIL import Image
+# from PIL.ExifTags import TAGS
 import os 
 import exifread
+from pyproj import Transformer
+import pandas as pd
+from pandas import ExcelWriter
+import numpy as np
 
+pd.options.display.float_format = '{:.9f}'.format
 
 def listarArchivos(path):
     os.chdir(path)
     archivos = os.listdir()
     return archivos
 
-def hallarMetadatos(archivos, path):
-    metadatos = []
-    cont = 0
-    for archivo in archivos:
-        imagen = Image.open(f'{path}\{archivo}')
-        metadato = imagen.getexif()
-        diccionario = {}
-        diccionario['nombre'] = archivo
-        for etiqueta, valor in metadato.items():
-            if etiqueta in TAGS:
-                diccionario[TAGS[etiqueta]]= valor
-        metadatos.append(diccionario)
+# def hallarMetadatos(archivos, path):
+#     metadatos = []
+#     cont = 0
+#     for archivo in archivos:
+#         imagen = Image.open(f'{path}\{archivo}')
+#         metadato = imagen.getexif()
+#         diccionario = {}
+#         diccionario['nombre'] = archivo
+#         for etiqueta, valor in metadato.items():
+#             if etiqueta in TAGS:
+#                 diccionario[TAGS[etiqueta]]= valor
+#         metadatos.append(diccionario)
     
-    for i in metadatos:
-        print(f'{i} \n')
-        cont +=1
+#     for i in metadatos:
+#         print(f'{i} \n')
+#         cont +=1
     
-    print(f'hay {cont} imagenes')
+#     print(f'hay {cont} imagenes')
 
 def hallarCoords(archivos, path):
     coords = []
@@ -85,8 +92,30 @@ def CoordenadasDecimales(DATOSFOTOS):
                             coordenadaDecimal *= -1
                         coordenadaFoto.append(coordenadaDecimal)
         coordenadasFotos.append(coordenadaFoto)
-        
+    for i in coordenadasFotos:
+        print(i)    
     return coordenadasFotos
+
+def transformar(origen, destino, ListaCoordenadas): 
+    CoordTransformadas = []
+    for foto in ListaCoordenadas:
+        try:
+            x=foto[1]
+            y=foto[2]
+        except:
+            x=nan
+            y=nan
+        origen=4326
+        destino=3857
+        transformer = Transformer.from_crs(origen, destino)
+        x2, y2 = transformer.transform(x, y)
+        foto.append(x2)
+        foto.append(y2)
+        CoordTransformadas.append(foto)
+
+    df=pd.DataFrame(CoordTransformadas, columns=['nombre', 'N', 'W', 'X', 'Y'])
+    print(df)
+    return df
 
 def run(path):
     listArchivos = listarArchivos(path)
@@ -100,6 +129,8 @@ if __name__=='__main__':
     listArchivos = listarArchivos(PATH)
     coords=hallarCoords(listArchivos, PATH)
     decimales = CoordenadasDecimales(coords)
-    for i in decimales:
-        print(i)
-    # run(PATH)
+    origen=4326
+    destino=3857
+    df=transformar(origen, destino, decimales)
+    df.to_csv(f'{PATH}\coordenadas.csv')
+
